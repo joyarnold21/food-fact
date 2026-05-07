@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import ErrorMessage from '../components/ErrorMessage.jsx'
 
 export default function SavedPage({ saved, dispatch }) {
   const navigate = useNavigate()
@@ -44,7 +43,6 @@ export default function SavedPage({ saved, dispatch }) {
           ))}
         </div>
       )}
-      {saved.length > 0 ? <ErrorMessage message="You can remove saved items or review their details." /> : null}
     </main>
   )
 }
