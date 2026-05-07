@@ -3,6 +3,33 @@ import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import ErrorMessage from '../components/ErrorMessage.jsx'
 
+function formatNutrient(value, nutrientName) {
+  if (!value || value === 'N/A') return 'N/A'
+
+  const numValue = typeof value === 'string' ? parseFloat(value) : value
+  if (isNaN(numValue)) return 'N/A'
+
+  const rounded = numValue.toFixed(1)
+
+  const unitMap = {
+    energy: 'kcal',
+    'energy-kcal': 'kcal',
+    'energy-kj': 'kJ',
+    fat: 'g',
+    'saturated-fat': 'g',
+    'trans-fat': 'g',
+    carbohydrates: 'g',
+    sugars: 'g',
+    fiber: 'g',
+    proteins: 'g',
+    salt: 'g',
+    sodium: 'mg',
+  }
+
+  const unit = unitMap[nutrientName.toLowerCase()] || 'g'
+  return `${rounded} ${unit}`
+}
+
 export default function DetailPage({ saved, dispatch }) {
   const { barcode } = useParams()
   const navigate = useNavigate()
@@ -78,20 +105,32 @@ export default function DetailPage({ saved, dispatch }) {
 
   const nutriments = product?.nutriments || {}
   const nutritionRows = [
-    { label: 'Energy', value: nutriments['energy-kcal_serving'] || nutriments['energy-kcal'] || nutriments.energy_kcal || 'N/A' },
-    { label: 'Fat', value: nutriments.fat || 'N/A' },
-    { label: 'Saturated Fat', value: nutriments['saturated-fat'] || nutriments['fat-saturated'] || 'N/A' },
-    { label: 'Carbohydrates', value: nutriments.carbohydrates || 'N/A' },
-    { label: 'Sugars', value: nutriments.sugars || 'N/A' },
-    { label: 'Proteins', value: nutriments.proteins || 'N/A' },
-    { label: 'Salt', value: nutriments.salt || nutriments['salt_100g'] || 'N/A' },
-  ]
+    { label: 'Energy', key: 'energy' },
+    { label: 'Fat', key: 'fat' },
+    { label: 'Saturated Fat', key: 'saturated-fat' },
+    { label: 'Carbohydrates', key: 'carbohydrates' },
+    { label: 'Sugars', key: 'sugars' },
+    { label: 'Proteins', key: 'proteins' },
+    { label: 'Salt', key: 'salt' },
+  ].map((item) => {
+    let value = nutriments[item.key]
+
+    if (!value) {
+      const altKey = `${item.key}_100g`
+      value = nutriments[altKey]
+    }
+
+    return {
+      ...item,
+      value: formatNutrient(value, item.key),
+    }
+  })
 
   return (
     <main className="page-shell detail-page">
       <section className="content-block detail-header">
         <button type="button" className="button secondary" onClick={() => navigate(-1)}>
-          Back
+          ← Back
         </button>
         <div>
           <p className="eyebrow">Product details</p>
@@ -121,14 +160,15 @@ export default function DetailPage({ saved, dispatch }) {
 
             <div className="detail-actions">
               <button type="button" className="button primary" onClick={handleToggleSave}>
-                {isSaved ? 'Remove Item' : 'Save Item'}
+                {isSaved ? '✓ Remove Item' : '+ Save Item'}
               </button>
-              <span className="detail-status">{isSaved ? 'Saved in your list' : 'Not saved yet'}</span>
+              <span className="detail-status">{isSaved ? '★ Saved in your list' : 'Not saved yet'}</span>
             </div>
 
             <section className="nutrition-grid">
+              <h3 style={{ gridColumn: '1 / -1', marginTop: '8px', marginBottom: '12px' }}>Nutrition per 100g</h3>
               {nutritionRows.slice(0, 6).map((item) => (
-                <div className="nutrition-item" key={item.label}>
+                <div className="nutrition-item" key={item.key}>
                   <span>{item.label}</span>
                   <strong>{item.value}</strong>
                 </div>
