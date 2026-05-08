@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SearchBar from '../components/SearchBar.jsx'
 import FoodCard from '../components/FoodCard.jsx'
@@ -33,13 +33,8 @@ export default function HomePage() {
   const [query, setQuery] = useState('')
   const [validation, setValidation] = useState('')
   const [recent, setRecent] = useState(getRecentSearches())
-  const [retryCount, setRetryCount] = useState(0)
   const { results, loading, error, searchFood } = useFoodSearch()
   const navigate = useNavigate()
-
-  useEffect(() => {
-    setRecent(getRecentSearches())
-  }, [])
 
   function handleChange(event) {
     const value = event.target.value
@@ -64,7 +59,6 @@ export default function HomePage() {
     }
 
     setValidation('')
-    setRetryCount(0)
     await searchFood(trimmed)
     saveRecentSearch(trimmed)
     setRecent(getRecentSearches())
@@ -81,7 +75,6 @@ export default function HomePage() {
   }
 
   async function handleRetry() {
-    setRetryCount((c) => c + 1)
     await performSearch(query)
   }
 

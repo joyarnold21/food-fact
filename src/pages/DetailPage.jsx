@@ -83,9 +83,6 @@ export default function DetailPage({ saved, dispatch }) {
 
     if (barcode) {
       loadProduct()
-    } else {
-      setError('No barcode provided for this product.')
-      setLoading(false)
     }
 
     return () => {
