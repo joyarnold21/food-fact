@@ -47,6 +47,9 @@ function App() {
         <Route path="/saved" element={<SavedPage saved={saved} dispatch={dispatch} />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
+      <footer className="app-footer">
+        <p>FoodFacts - Powered by OpenFoodFacts API</p>
+      </footer>
     </div>
   )
 }
