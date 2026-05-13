@@ -1,9 +1,11 @@
+import Alert from '@mui/material/Alert'
+
 export default function ErrorMessage({ message }) {
   if (!message) return null
 
   return (
-    <div className="error-message" role="alert">
+    <Alert severity="error" sx={{ my: 2 }} role="alert">
       {message}
-    </div>
+    </Alert>
   )
 }
