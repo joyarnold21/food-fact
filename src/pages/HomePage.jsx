@@ -1,5 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
 import SearchBar from '../components/SearchBar.jsx'
 import FoodCard from '../components/FoodCard.jsx'
 import ErrorMessage from '../components/ErrorMessage.jsx'
@@ -85,82 +92,113 @@ export default function HomePage() {
   const showRecent = !loading && results.length === 0 && !error && query === ''
 
   return (
-    <main className="page-shell">
-      <section className="home-hero">
-        <div>
-          <p className="eyebrow">Search Food Facts</p>
-          <h1>Find nutrition details by product name or barcode.</h1>
-          <p className="hero-copy">
-            Search the Open Food Facts dataset, explore products, and save items for later review.
-          </p>
-        </div>
-      </section>
+    <Container component="main" maxWidth="lg" sx={{ py: 4 }}>
+      {/* Hero Section */}
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="body2" component="p" sx={{ color: '#6b7280', fontWeight: 600, mb: 1 }}>
+          SEARCH FOOD FACTS
+        </Typography>
+        <Typography variant="h1" sx={{ mb: 2 }}>
+          Find nutrition details by product name or barcode.
+        </Typography>
+        <Typography variant="body1" sx={{ color: '#6b7280', mb: 4 }}>
+          Search the Open Food Facts dataset, explore products, and save items for later review.
+        </Typography>
+      </Box>
 
-      <section className="content-block">
+      {/* Search Section */}
+      <Box sx={{ mb: 6 }}>
         <SearchBar value={query} onChange={handleChange} onSubmit={handleSubmit} disabled={loading} />
         <ErrorMessage message={validation || error} />
         {error && (
-          <button type="button" className="button secondary" onClick={handleRetry} style={{ marginTop: '12px' }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleRetry}
+            sx={{ mt: 2 }}
+          >
             Try again
-          </button>
+          </Button>
         )}
-      </section>
+      </Box>
 
+      {/* Recent Searches */}
       {showRecent && recent.length > 0 && (
-        <section className="content-block">
-          <div className="recent-searches">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <p className="eyebrow">Recent searches</p>
-              <button
-                type="button"
-                className="button-link"
-                onClick={() => {
-                  clearRecentSearches()
-                  setRecent([])
-                }}
-              >
-                Clear
-              </button>
-            </div>
-            <div className="recent-chips">
-              {recent.map((term) => (
-                <button
-                  key={term}
-                  type="button"
-                  className="chip"
-                  onClick={() => handleRecentClick(term)}
-                >
-                  {term}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+        <Box sx={{ mb: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="body2" sx={{ color: '#6b7280', fontWeight: 600 }}>
+              RECENT SEARCHES
+            </Typography>
+            <Button
+              size="small"
+              onClick={() => {
+                clearRecentSearches()
+                setRecent([])
+              }}
+              sx={{
+                textTransform: 'none',
+                color: '#6b7280',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              Clear
+            </Button>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {recent.map((term) => (
+              <Chip
+                key={term}
+                label={term}
+                onClick={() => handleRecentClick(term)}
+                variant="outlined"
+                color="primary"
+              />
+            ))}
+          </Box>
+        </Box>
       )}
 
-      <section className="content-block">
+      {/* Results Section */}
+      <Box>
         {loading ? (
-          <div className="grid-list">
+          <Grid container spacing={3}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <LoadingCard key={i} />
+              <Grid key={i} xs={12} sm={6} md={4}>
+                <LoadingCard />
+              </Grid>
             ))}
-          </div>
+          </Grid>
         ) : results.length === 0 && !error ? (
-          <div className="status-panel">Start a search to discover food products.</div>
+          <Box
+            sx={{
+              textAlign: 'center',
+              py: 6,
+              backgroundColor: '#f9fafb',
+              borderRadius: 2,
+              border: '1px solid #e5e7eb',
+            }}
+          >
+            <Typography variant="body1" color="textSecondary">
+              Start a search to discover food products.
+            </Typography>
+          </Box>
         ) : null}
 
         {results.length > 0 ? (
-          <div className="grid-list">
+          <Grid container spacing={3}>
             {results.map((product) => (
-              <FoodCard
-                key={product.code}
-                product={product}
-                onClick={() => handleSelectProduct(product.code)}
-              />
+              <Grid key={product.code} xs={12} sm={6} md={4}>
+                <FoodCard
+                  product={product}
+                  onClick={() => handleSelectProduct(product.code)}
+                />
+              </Grid>
             ))}
-          </div>
+          </Grid>
         ) : null}
-      </section>
-    </main>
+      </Box>
+    </Container>
   )
 }
